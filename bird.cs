@@ -20,7 +20,8 @@ public class bird : MonoBehaviour {
             //使用上一行代码会存在一个问题，鼠标的位置和当前物体的位置不在同一个坐标系下，小鸟的位置是在世界坐标系下(例如在unity中默认的(0,0)点位置和鼠标所在(0,0)点的位置(鼠标的(0,0)点是在屏幕的左下角)不同)需要来统一坐标系
             transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);//将屏幕坐标转化为世界坐标
             //这里存在一个问题，拖拽小鸟时出现小鸟的z轴被强制赋值为-10，和相机的z轴保持一致，在3D视角下可以发现，当小鸟的z轴小于-10或者大于0则相机都无法拍摄到小鸟的位置，所以需要强制锁定小鸟拖拽后的z轴的值在-10到0之间
-            transform.position += new Vector3(0, 0, 6);//强制锁定小鸟的z轴值为-4
+            //transform.position += new Vector3(0, 0, 6);//强制锁定小鸟的z轴值为-4（方法一）
+	    transform.position += new Vector3(0, 0, -Camera.main.transform.position.z);//将小鸟的z轴坐标加上主摄像机的z轴坐标的赋值来强制锁定小鸟的z轴为0（方法二）
         }
     }
 }
