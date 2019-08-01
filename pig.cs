@@ -11,7 +11,7 @@ public class pig : MonoBehaviour {
     {
         render = GetComponent<SpriteRenderer>();//初始化组件
     }
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void OnCollisionEnter2D(Collision2D collision)//碰撞器方法使用
     {
         if (collision.relativeVelocity.magnitude > maxSpeed)//判断相对速度的大小，由于速度是个矢量，这里只要大小
         {
