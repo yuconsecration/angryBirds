@@ -6,13 +6,26 @@ public class bird : MonoBehaviour {
     private bool isClick = false;
     public Transform rightPos;//Transform包含了物体的位置，旋转等信息，这里用来申明一个物体rightPos   
     public float maxDis = 3;//设置小鸟拖拽的最大距离
+    public SpringJoint2D sp;//定义一个SpringJoint2D类型的组件
+    private Rigidbody2D rg;//定义一个组件
+    //Awake()是在脚本对象实例化时被调用的，而Start()是在对象的第一帧时被调用的，而且是在Update()之前。
+    private void Awake()
+    {
+        sp = GetComponent<SpringJoint2D>();//脚本将自动识别物体中的SpringJoint2D组件，并将其赋值给sp
+        rg = GetComponent<Rigidbody2D>();//组件赋值
+    }
     private void OnMouseDown()//当用户在GUIElement或者碰撞器中按下鼠标时系统会自动调用的函数
     {
         isClick = true;
+        //
+        rg.isKinematic = true;//表示开启运动学
     }
     private void OnMouseUp()//当用户在GUIElement或者碰撞器中抬起鼠标时系统会自动调用的函数
     {
+        //该部分力学分析：当不更改任何条件时，小鸟在被拖拽起来后受到重力和弹簧的弹力两个力的作用，当受力达不到理想的效果的时候，小鸟就有可能达不到理想的平抛效果，这是可以采取一种方法来实现小鸟的平抛效果，首先
         isClick = false;
+        rg.isKinematic = false;//表示关闭运动学
+        Invoke("Fly", 0.1f);//使用Invoke函数来实现延时执行函数，前面表示执行的函数名称，后面的表示延时的时长
     }
     private void Update()
     {
@@ -31,5 +44,9 @@ public class bird : MonoBehaviour {
                 transform.position = pos + rightPos.position;//小鸟的位置限制
             }
         }
+    }
+    public void Fly()//设定一个函数Fly()用来关闭弹簧的功能
+    {
+        sp.enabled = false;//当鼠标弹起时，将弹簧的功能禁用，可实现小鸟飞出的功能
     }
 }
