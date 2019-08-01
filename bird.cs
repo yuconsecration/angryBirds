@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class bird : MonoBehaviour {
-    private bool isClick = false;
-    public Transform rightPos;//Transform包含了物体的位置，旋转等信息，这里用来申明一个物体rightPos   
+    private bool isClick = false;  
     public float maxDis = 3;//设置小鸟拖拽的最大距离
     public SpringJoint2D sp;//定义一个SpringJoint2D类型的组件
     private Rigidbody2D rg;//定义一个组件
+    public LineRenderer left;//定义左边的线
+    public Transform leftPos;//Transform包含了物体的位置，旋转等信息，这里用来申明一个物体leftPos 
+    public LineRenderer right;//定义右边的线
+    public Transform rightPos;//Transform包含了物体的位置，旋转等信息，这里用来申明一个物体rightPos 
     //Awake()是在脚本对象实例化时被调用的，而Start()是在对象的第一帧时被调用的，而且是在Update()之前。
     private void Awake()
     {
@@ -43,10 +46,18 @@ public class bird : MonoBehaviour {
                 pos *= maxDis;//得到最大长度向量
                 transform.position = pos + rightPos.position;//小鸟的位置限制
             }
+            Line();
         }
     }
     public void Fly()//设定一个函数Fly()用来关闭弹簧的功能
     {
         sp.enabled = false;//当鼠标弹起时，将弹簧的功能禁用，可实现小鸟飞出的功能
+    }
+    public void Line()//划线操作，原理：两点确定一条直线
+    {
+        right.SetPosition(0, rightPos.position);//锁定第一个点，索引为0
+        right.SetPosition(1, transform.position);//锁定第二个点，索引为1
+        left.SetPosition(0, leftPos.position);
+        left.SetPosition(1, transform.position);
     }
 }
