@@ -287,3 +287,69 @@ public class bird : MonoBehaviour {
 ```
 
 > 说明：当画出的线和树梢之间有一定间隔的时候，可能时rightPos物体和leftPose物体出现了问题，如果在场景面板中点击这两个物体，在窗口中不显示可移动的坐标图标，则需要重新创建这两个物体。
+
+### 2.9死亡，加分特效制作
+
+1. 设置死亡烟雾动画特效的制定：动画可以理解为多个图片连续播放形成的结果。
+> 在BIRDS_1中裁剪出需要连续播放的图片(当图片太零散是可以手动选择多个零散图片组合成一个所需的图片)，按住ctrl键选择多个图片后拖动到场景内，会显示一个窗口（在该窗口中在Assets文件夹中创建名为animation，用来存放动画，将所选择的多个图片保存在该文件夹中重命名为boom（当同时选择多个图片拖拽到场景中时，uinty会自动识别为动画）），回到场景中将动画的名称修改为boom。
+
+> 说明：如何修改动画中图片的播放顺序？
+> 选择场景中动画的物体，选择ctrl+6就可以打开播放设置，在这个界面可以进行图片的顺序调换，图片的删除等操作，同时还可以改变图片之间的间隔时间。这里由于只需要这个动画在实际操作中播放一次，而动画系统默认时循环播放，点击工程窗口中刚刚新建的animation，选择其中的boom并将loop time选项不勾选即可，在物体boom中添加代码用来实现毁灭物体的操作，同时在动画的设置界面中在动画的最后一帧中添加该事件。
+> ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190802123006379.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0lUX1NvZnRFbmdpbmVlcg==,size_16,color_FFFFFF,t_70)
+> ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190802123024989.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0lUX1NvZnRFbmdpbmVlcg==,size_16,color_FFFFFF,t_70)
+代码如下：
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+public class boom : MonoBehaviour {
+    public void destroyBoom()
+    {
+        Destroy(gameObject);
+    }
+	}
+
+2. 在脚本pig.cs中添加代码：
+
+```
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class pig : MonoBehaviour
+{
+    public float maxSpeed = 10;//设置相对速度的上线
+    public float minSpeed = 5;//设置相对速度的下线
+    private SpriteRenderer render;//定义一个组件
+    public Sprite hurt;//定义一个精灵
+    public GameObject boom;//定义一个物体，用来表示动画
+    public GameObject pigScore;//定义一个物体，用来表示分数显示
+    private void Awake()
+    {
+        render = GetComponent<SpriteRenderer>();//初始化组件
+    }
+    public void OnCollisionEnter2D(Collision2D collision)//碰撞器方法使用
+    {
+        if (collision.relativeVelocity.magnitude > maxSpeed)//判断相对速度的大小，由于速度是个矢量，这里只要大小
+        {
+            destroyPig();
+        }
+        else if (collision.relativeVelocity.magnitude > minSpeed && collision.relativeVelocity.magnitude < maxSpeed)
+        {
+            render.sprite = hurt;//改变组件中的sprite的值为hurt（这里表示更换图片）
+        }
+    }
+    public void destroyPig()//定义一个函数用来实现猪死亡后的操作
+    {
+        Destroy(gameObject);//直接毁掉猪
+        Instantiate(boom, transform.position, Quaternion.identity);//instantiate函数可以用来实例化物体（可以理解为显示物体），后面两个参数分别表示物体显示的位置和是否旋转，Quaternion.identity表示不旋转
+        GameObject go = Instantiate(pigScore, transform.position + new Vector3(0, 0.6f, 0), Quaternion.identity);//这里表示将分数的显示位置的y轴向上偏移了
+        Destroy(go, 1.0f);//在1秒后毁坏物体，前面动画播放完毕后动画消失的功能除了在结束时间的帧上添加一个毁坏物体的事件外，也可以采用这种方法
+                          //这里存在一个问题：就是这里毁坏物体不能够直接输入物体的名称，而是必须将其赋值给一个物体，这是因为在本案例中，该物体不会存在与场景中，而是需要通过代码进行调用，这里必须将这种既不能存在于场景中又要被调用的物体添加到工程目录下的prefabs文件夹中（该文件夹用来存放物体的模板，以保证物体在场景中被删除时可以被正常调用），对于不存在与场景中的物体如果直接在代码进行毁灭会导致模板被毁掉的风险，导致下次无法调用，所以需要将其赋值给一个物体，通过该物体进行显示，对该物体进行毁灭；如果该物体存在于场景中就可以直接删除
+    }
+
+}
+```
+
+3. 显示分数：通过裁剪相关的分数，采取同上面相同的方法进行实现，代码如上。上面时显示动画，这里为显示图片，同理。
+
+### 2.10游戏逻辑的判定，实现多只小鸟的飞出
