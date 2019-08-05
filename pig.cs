@@ -10,6 +10,7 @@ public class pig : MonoBehaviour
     public Sprite hurt;//定义一个精灵
     public GameObject boom;//定义一个物体，用来表示动画
     public GameObject pigScore;//定义一个物体，用来表示分数显示
+    public bool isPig = false;//判断是不是猪，用来指定消失的物体是猪，可以在属性面板中指定是不是猪
     private void Awake()
     {
         render = GetComponent<SpriteRenderer>();//初始化组件
@@ -27,6 +28,10 @@ public class pig : MonoBehaviour
     }
     public void destroyPig()//定义一个函数用来实现猪死亡后的操作
     {
+        if (isPig)
+        {
+            gameManager._instance.pigs.Remove(this);//移除集合中的猪，在执行是可以在属性面板中看到集合中相关物体的消失
+        }
         Destroy(gameObject);//直接毁掉猪
         Instantiate(boom, transform.position, Quaternion.identity);//instantiate函数可以用来实例化物体（可以理解为显示物体），后面两个参数分别表示物体显示的位置和是否旋转，Quaternion.identity表示不旋转
         GameObject go = Instantiate(pigScore, transform.position + new Vector3(0, 0.6f, 0), Quaternion.identity);//这里表示将分数的显示位置的y轴向上偏移了
