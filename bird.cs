@@ -27,6 +27,8 @@ public class bird : MonoBehaviour {
     }
     private void OnMouseUp()//当用户在GUIElement或者碰撞器中抬起鼠标时系统会自动调用的函数
     {
+        right.enabled = false;
+        left.enabled = false;//鼠标抬起时禁用划线的功能
         //该部分力学分析：当不更改任何条件时，小鸟在被拖拽起来后受到重力和弹簧的弹力两个力的作用，当受力达不到理想的效果的时候，小鸟就有可能达不到理想的平抛效果，这是可以采取一种方法来实现小鸟的平抛效果，首先
         isClick = false;
         rg.isKinematic = false;//表示关闭运动学
@@ -34,7 +36,7 @@ public class bird : MonoBehaviour {
     }
     private void Update()
     {
-        if (isClick)//当鼠标一直按下时
+        if (isClick)//当鼠标一直按下时，使用相关的运动学进行有关的使用及输出
         {
             //transform.position = Input.mousePosition;//将鼠标的位置赋值给当前物体的位置，transform理解为当前物体
             //使用上一行代码会存在一个问题，鼠标的位置和当前物体的位置不在同一个坐标系下，小鸟的位置是在世界坐标系下(例如在unity中默认的(0,0)点位置和鼠标所在(0,0)点的位置(鼠标的(0,0)点是在屏幕的左下角)不同)需要来统一坐标系
@@ -58,6 +60,8 @@ public class bird : MonoBehaviour {
     }
     public void Line()//划线操作，原理：两点确定一条直线
     {
+        right.enabled = true;
+        left.enabled = true;//开启组件实现划线功能
         right.SetPosition(0, rightPos.position);//锁定第一个点，索引为0
         right.SetPosition(1, transform.position);//锁定第二个点，索引为1
         left.SetPosition(0, leftPos.position);
