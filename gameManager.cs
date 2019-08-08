@@ -6,8 +6,10 @@ public class gameManager : MonoBehaviour
 {
     public List<bird> birds;//创建鸟的集合
     public List<pig> pigs;//创建猪的集合
-    public static gameManager _instance;//用来为其他脚本访问该脚本提供接口
+    public static gameManager _instance;//用来为其他脚本访问该脚本提供接口  
     private Vector3 originPos;//初始化的位置
+    public GameObject win;
+    public GameObject lose;
     private void Awake()
     {
         _instance = this;
@@ -58,12 +60,18 @@ public class gameManager : MonoBehaviour
             else
             {
                 //输了
+                lose.SetActive(true);
             }
         }
         else
         {
             //赢了
+            win.SetActive(true);
         }
+    }
+    public void showStars()
+    {
+
     }
 }
     
