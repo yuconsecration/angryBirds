@@ -13,11 +13,13 @@ public class bird : MonoBehaviour {
     public LineRenderer right;//定义右边的线
     public Transform rightPos;//Transform包含了物体的位置，旋转等信息，这里用来申明一个物体rightPos 
     public GameObject boom;
+    private TestMyTrail myTrail;
     //Awake()是在脚本对象实例化时被调用的，而Start()是在对象的第一帧时被调用的，而且是在Update()之前。
     private void Awake()
     {
         sp = GetComponent<SpringJoint2D>();//脚本将自动识别物体中的SpringJoint2D组件，并将其赋值给sp
         rg = GetComponent<Rigidbody2D>();//组件赋值
+        myTrail = GetComponent<TestMyTrail>();//获取拖尾效果脚本
     }
     private void OnMouseDown()//当用户在GUIElement或者碰撞器中按下鼠标时系统会自动调用的函数
     {
@@ -55,6 +57,7 @@ public class bird : MonoBehaviour {
     }
     public void Fly()//设定一个函数Fly()用来关闭弹簧的功能
     {
+        myTrail.trailStart();
         sp.enabled = false;//当鼠标弹起时，将弹簧的功能禁用，可实现小鸟飞出的功能
         Invoke("Next", 5);//实现5秒后实现Next函数
     }
@@ -76,5 +79,13 @@ public class bird : MonoBehaviour {
         Destroy(gameObject);
         Instantiate(boom, transform.position, Quaternion.identity);//显示特效
         gameManager._instance.NextBird(); 
+    }
+    /// <summary>
+    /// 一个碰撞器用来实现当小鸟碰撞到猪时关闭拖尾效果
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        myTrail.trailClear();
     }
 }
