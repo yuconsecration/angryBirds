@@ -10,6 +10,7 @@ public class gameManager : MonoBehaviour
     private Vector3 originPos;//初始化的位置
     public GameObject win;
     public GameObject lose;
+    public GameObject[] stars;//设定一个数组用来存放星星的数量（将组件中的星星进行赋值）
     private void Awake()
     {
         _instance = this;
@@ -69,9 +70,26 @@ public class gameManager : MonoBehaviour
             win.SetActive(true);
         }
     }
+    /// <summary>
+    /// 通过游戏中小鸟的数量来设置星星的颗数
+    /// </summary>
     public void showStars()
     {
+        StartCoroutine("show");//启用设定的协程函数show()
+    }
+    /// <summary>
+    /// 协程的书写来控制星星一颗一颗的显示
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator show()//设置一个协程函数show用来实现等待功能
+    {
+        for (int i = 0; i < birds.Count + 1; i++)//零个小鸟显示一颗星星,加一的原因在于如果当前的游戏场景中小鸟的数量就是零会出现一个bug，导致无法显示一颗星星
+        {
+            
+            stars[i].SetActive(true);
+            yield return new WaitForSeconds(0.4f);//表示等待0.4秒
 
+        }
     }
 }
     
