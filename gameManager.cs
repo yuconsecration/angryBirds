@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement; 
 
 public class gameManager : MonoBehaviour
 {
@@ -81,7 +82,7 @@ public class gameManager : MonoBehaviour
     /// 协程的书写来控制星星一颗一颗的显示
     /// </summary>
     /// <returns></returns>
-    IEnumerator show()//设置一个协程函数show用来实现等待功能
+    IEnumerator show()//设置一个协程函数show用来实现等待功能（用于实现星星一颗一颗出现且间隔有一个时间差）
     {
         for (int i = 0; i < birds.Count + 1; i++)//零个小鸟显示一颗星星,加一的原因在于如果当前的游戏场景中小鸟的数量就是零会出现一个bug，导致无法显示一颗星星
         {
@@ -90,6 +91,20 @@ public class gameManager : MonoBehaviour
             yield return new WaitForSeconds(0.4f);//表示等待0.4秒
 
         }
+    }
+    /// <summary>
+    /// 重玩点击事件,需要加入命名空间UnityEngine.SceneManagement，重玩点击后重新加载gameManager场景
+    /// </summary>
+    public void Replay()
+    {
+        SceneManager.LoadScene(2); //重玩界面为重新加载game场景，2表示game场景的默认下标为2（在Uinty中点击file选择build setttings后，将设置的多个场景直接拖入到界面中，系统会给每一个场景设置一个下标）
+    }
+    /// <summary>
+    /// 返回主菜单点击事件
+    /// </summary>
+    public void Home()
+    {
+        SceneManager.LoadScene(1); 
     }
 }
     
