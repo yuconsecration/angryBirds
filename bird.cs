@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class bird : MonoBehaviour {
-    private bool isClick = false;  
+    [HideInInspector]
+    public bool isClick = false;  
     public float maxDis = 3;//设置小鸟拖拽的最大距离
     public SpringJoint2D sp;//定义一个SpringJoint2D类型的组件
     [HideInInspector]//在属性面板中隐藏组件（如果组件的形式为Private则在属性面板中不显示，如果组件的形式为public则在属性面板中显示）
@@ -14,7 +15,10 @@ public class bird : MonoBehaviour {
     public Transform rightPos;//Transform包含了物体的位置，旋转等信息，这里用来申明一个物体rightPos 
     public GameObject boom;
     private TestMyTrail myTrail;
+    private bool canMove = true;//用来判断小鸟能否移动（解决在小鸟飞出到消失的时间内点击小鸟仍出现划线的效果的bug）
     //Awake()是在脚本对象实例化时被调用的，而Start()是在对象的第一帧时被调用的，而且是在Update()之前。
+    public float smooth = 3;//设置相机跟随小鸟的速率
+    public float posX;
     private void Awake()
     {
         sp = GetComponent<SpringJoint2D>();//脚本将自动识别物体中的SpringJoint2D组件，并将其赋值给sp
@@ -23,18 +27,29 @@ public class bird : MonoBehaviour {
     }
     private void OnMouseDown()//当用户在GUIElement或者碰撞器中按下鼠标时系统会自动调用的函数
     {
-        isClick = true;
-        //
-        rg.isKinematic = true;//表示开启运动学
+        if (gameManager._instance.can == false)
+            canMove = false;
+        if (canMove) {
+            isClick = true;
+            rg.isKinematic = true;//表示开启运动学
+            
+        }
+        
     }
     private void OnMouseUp()//当用户在GUIElement或者碰撞器中抬起鼠标时系统会自动调用的函数
     {
-        right.enabled = false;
-        left.enabled = false;//鼠标抬起时禁用划线的功能
-        //该部分力学分析：当不更改任何条件时，小鸟在被拖拽起来后受到重力和弹簧的弹力两个力的作用，当受力达不到理想的效果的时候，小鸟就有可能达不到理想的平抛效果，这是可以采取一种方法来实现小鸟的平抛效果，首先
-        isClick = false;
-        rg.isKinematic = false;//表示关闭运动学
-        Invoke("Fly", 0.1f);//使用Invoke函数来实现延时执行函数，前面表示执行的函数名称，后面的表示延时的时长
+        if (canMove)
+        {
+            right.enabled = false;
+            left.enabled = false;//鼠标抬起时禁用划线的功能
+                                 //该部分力学分析：当不更改任何条件时，小鸟在被拖拽起来后受到重力和弹簧的弹力两个力的作用，当受力达不到理想的效果的时候，小鸟就有可能达不到理想的平抛效果，这是可以采取一种方法来实现小鸟的平抛效果，首先
+            isClick = false;
+            rg.isKinematic = false;//表示关闭运动学
+            Invoke("Fly", 0.1f);//使用Invoke函数来实现延时执行函数，前面表示执行的函数名称，后面的表示延时的时长
+                                //禁用划线操作
+            canMove = false;//当鼠标抬起时到下一个小鸟飞起时禁用小鸟的划线功能和小鸟位置随鼠标移动的功能
+        }
+        
     }
     private void Update()
     {
@@ -52,8 +67,13 @@ public class bird : MonoBehaviour {
                 pos *= maxDis;//得到最大长度向量
                 transform.position = pos + rightPos.position;//小鸟的位置限制
             }
-            Line();
+            Line();//这里存在一个bug，由于每一只小鸟飞出5秒后才被毁灭，由于小鸟在飞出的那一刻就禁用了sp弹簧组件故5秒内弹簧功能就失效了，但是如果5秒内点击小鸟该部分代码仍然可以被执行且划线功能仍存在，不能达到理想的效果（解决方案：）
         }
+        //相机跟随
+        posX = transform.position.x;//获取到小鸟的x轴的位置
+        //利用差值来实现相机的跟随，第一个值表示初始点，第二个值表示目标点，第三个值表示速率，即理解为物体以一个速率从初始点向目标点移动
+        Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(Mathf.Clamp(posX, 0, 15), Camera.main.transform.position.y, Camera.main.transform.position.z), smooth*Time.deltaTime);//Mathf.Clamp(posX, 0, 15）中的0和15分别表示小鸟的坐标下限和坐标上限，其中当小鸟的坐标小于下限或者小鸟的坐标大于上限时按照临界点进行输出
+
     }
     public void Fly()//设定一个函数Fly()用来关闭弹簧的功能
     {
