@@ -7,11 +7,21 @@ public class gameManager : MonoBehaviour
 {
     public List<bird> birds;//创建鸟的集合
     public List<pig> pigs;//创建猪的集合
-    public static gameManager _instance;//用来为其他脚本访问该脚本提供接口  
+    public static gameManager _instance;//用来为其他脚本访问该脚本提供接口（一种取代通过对象访问的方法)  
     private Vector3 originPos;//初始化的位置
     public GameObject win;
     public GameObject lose;
     public GameObject[] stars;//设定一个数组用来存放星星的数量（将组件中的星星进行赋值）
+    public bool can = true;//用来表示赢下比赛后小鸟不能移动的判定变量
+    bird rb = new bird();//实例化bird类，用来调用bird类中的属性和方法
+    private bool move = false;//用来作为照相机移动的判定
+    private void Update()
+    {
+        if (move)
+        {
+            loseCameraReturn();//游戏失败后移动照相机到初始位置
+        }
+    }
     private void Awake()
     {
         _instance = this;
@@ -52,7 +62,7 @@ public class gameManager : MonoBehaviour
     /// </summary>
     public void NextBird()
     {
-        if (pigs.Count > 0)
+        if (pigs.Count >0)
         {
             if (birds.Count > 0)
             {
@@ -62,13 +72,16 @@ public class gameManager : MonoBehaviour
             else
             {
                 //输了
+                move = true;
                 lose.SetActive(true);
             }
         }
         else
         {
             //赢了
+            Initialized();//表示下一只小鸟来到弹簧上，提供给小鸟一个位置，为镜头能回到初始位置提供一个参照值
             win.SetActive(true);
+            can = false;//设置为false表示小鸟不能移动
         }
     }
     /// <summary>
@@ -105,6 +118,13 @@ public class gameManager : MonoBehaviour
     public void Home()
     {
         SceneManager.LoadScene(1); 
+    }
+    /// <summary>
+    /// 用来实现输了比赛后相机返回到初始小鸟的位置
+    /// </summary>
+    public void loseCameraReturn()
+    {
+        Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(0, Camera.main.transform.position.y, Camera.main.transform.position.z), rb.smooth * Time.deltaTime);//Time.deltaTime乘上一个速率表示速度为几米每秒，但是这种为帧数速度，需要在update函数下执行
     }
 }
     
